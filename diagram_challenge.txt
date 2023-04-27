@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant t as terminal
+    participant app as Main program (in app.rb)
+    participant book as BookRepository class <br /> (in lib/book_repository.rb)
+    participant data_conn as DatabaseConnection class in (in lib/database_connection.rb)
+    participant data as Postgres database
+
+    Note left of t: Flow of time <br />⬇ <br /> ⬇ <br /> ⬇ 
+
+    t->>app: Runs `ruby app.rb`
+    app->>db_conn: Opens connection to database by calling connect method on DatabaseConnection
+    db_conn->>db_conn: Opens database connection using PG and stores the connection
+    app->>book: Calls all method on BookRepository
+    book->>db_conn: Sends SQL query by calling exec_params on BookRepository
+    db_conn->>data: Sends query to the database from database connection
+    data->>db_conn: Returns a list of hashes for each row in the books table
+
+    db_conn->>book: Returns an array of hashes for each row in the books table
+    loop 
+        book->>book: Loops through the array and creates a Book object for every row
+    end
+    book->>app: Returns the list of Book objects
+    app->>t: Prints the list of books to terminal
